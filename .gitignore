@@ -1,0 +1,16 @@
+# Datos personales: nunca al repositorio
+seed.local.json
+armario-respaldo-*.json
+
+# Informe de auditoría: describe cómo atacar la app
+SEGURIDAD.md
+
+# Versión 3D guardada aparte (avatar con modelo real); no se publica
+_archivo_3d/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+__pycache__/
+node_modules/

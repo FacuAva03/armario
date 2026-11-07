@@ -1,0 +1,17 @@
+{
+  "name": "Mi armario",
+  "short_name": "Armario",
+  "description": "Mi armario: las prendas que tengo, ordenadas, y las combinaciones para cada ocasión.",
+  "lang": "es-AR",
+  "start_url": "./#hoy",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3b2719",
+  "theme_color": "#3b2719",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mi armario</title>
+  <meta name="description" content="Mi armario: las prendas que tengo, ordenadas, y las combinaciones para cada ocasión.">
+  <!-- Política de contenido: solo se ejecuta código propio y el SDK de Firebase; nada inline. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'self' https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="theme-color" content="#3b2719">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Armario">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <main id="vista" class="vista" aria-live="polite">
+    <div class="cargando"><span></span></div>
+  </main>
+  <nav id="tabbar" class="tabbar" hidden aria-label="Secciones">
+    <a href="#hoy" data-tab="hoy">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V6.6a1.9 1.9 0 1 1 1.9 1.9M12 8 3.4 14.2a1 1 0 0 0 .6 1.8h16a1 1 0 0 0 .6-1.8z"/><path d="M5 20h14"/></svg>
+      <span>Hoy</span>
+    </a>
+    <a href="#armario" data-tab="armario">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M9.5 12v2M14.5 12v2"/></svg>
+      <span>Armario</span>
+    </a>
+    <a href="#looks" data-tab="looks">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+      <span>Looks</span>
+    </a>
+    <a href="#yo" data-tab="yo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h18v6H3zM7 9v3M11 9v2M15 9v3M19 9v2"/></svg>
+      <span>Medidas</span>
+    </a>
+  </nav>
+  <dialog id="hoja" class="hoja"></dialog>
+  <div id="aviso" class="aviso" role="status" hidden></div>
+</body>
+</html>
