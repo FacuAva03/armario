@@ -17,6 +17,7 @@ let slotActivo = 'top';
 let soloTengo = false;
 let catHoy = null;          // categoría activa en el selector de "Hoy"
 let filtroCat = null;       // categoría activa en el Armario
+let verDorso = false;       // en Hoy: mostrar las prendas de espaldas (si tienen foto del dorso)
 let ocasionActiva = null;   // ocasión activa en los Looks
 const LOOK_VACIO = () => ({ top: null, capa: null, bottom: null, medias: null, shoes: null, acc: [] });
 let look = LOOK_VACIO();
@@ -78,8 +79,9 @@ function descargar(nombre, contenido) {
 }
 
 // ---------- Imágenes de las prendas ----------
-function imagen(p) {
-  if (p.foto) return `<div class="img foto" style="background-image:url(${esc(p.foto)})" role="img" aria-label="${esc(p.nombre)}"></div>`;
+function imagen(p, dorso = false) {
+  const f = dorso && p.foto2 ? p.foto2 : p.foto;
+  if (f) return `<div class="img foto" style="background-image:url(${esc(f)})" role="img" aria-label="${esc(p.nombre)}${dorso && p.foto2 ? ' (dorso)' : ''}"></div>`;
   return `<div class="img sil">${silueta(p)}</div>`;
 }
 
@@ -94,7 +96,7 @@ function tablero(lk, mp, mini = false) {
   const it = id => (id ? mp.get(id) : null);
   const extras = (lk.acc || []).map(it).filter(Boolean);
   const pieza = (clase, p, slot, vacio) => {
-    const cuerpo = p ? `${imagen(p)}${mini ? '' : `<span class="nom">${esc(p.nombre)}</span>`}` : `<div class="hueco"><b>+</b><small>${vacio}</small></div>`;
+    const cuerpo = p ? `${imagen(p, !mini && verDorso)}${mini ? '' : `<span class="nom">${esc(p.nombre)}</span>`}` : `<div class="hueco"><b>+</b><small>${vacio}</small></div>`;
     return mini
       ? `<div class="pieza ${clase}${p ? '' : ' vacia'}">${cuerpo}</div>`
       : `<button class="pieza ${clase}${p ? '' : ' vacia'}" data-pick="${slot}" aria-label="${vacio}">${cuerpo}</button>`;
@@ -150,6 +152,7 @@ function pintarHoy() {
 
   $('#mesa').innerHTML = `${tablero(look, mp)}
     ${notas.length ? `<div class="notas-uso">${notas.map(n => `<span>${esc(n)}</span>`).join('')}</div>` : ''}
+    ${[look.top, look.capa, look.bottom, look.medias, look.shoes, ...look.acc].some(id => mp.get(id)?.foto2) ? `<div class="notas-uso"><button class="chip suave${verDorso ? ' on' : ''}" data-accion="dorso">${verDorso ? 'Ver de frente' : 'Ver de espaldas'}</button></div>` : ''}
     ${faltan.length ? `<p class="faltan">Te falta comprar: ${faltan.map(p => esc(p.nombre)).join(', ')}.</p>` : ''}`;
 
   $('#sel').innerHTML = `<h3>Elegí de tu armario</h3>
@@ -278,9 +281,14 @@ function abrirEditor(id) {
         <div class="campo"><label>Nombre</label><input type="text" name="nombre" value="${esc(p.nombre)}" placeholder="Ej: Remera azul lavada" required></div>
         <div class="campo"><label>Tipo</label><select name="tipo">${Object.entries(TIPOS).map(([k, v]) => `<option value="${k}"${p.tipo === k ? ' selected' : ''}>${v.nombre}</option>`).join('')}</select></div>
         ${slotsDe(p.tipo).length > 1 ? `<div class="campo"><label>¿Cómo la usás?</label><select name="slot">${slotsDe(p.tipo).map(sl => `<option value="${sl}"${(p.slot || TIPOS[p.tipo].slot) === sl ? ' selected' : ''}>${USO_SLOT[sl]}</option>`).join('')}</select></div>` : ''}
-        <div class="campo"><label>Foto (de frente, plana sobre la cama o el piso, con luz pareja)</label>
-          <div class="foto-previa" id="prev" style="${p.foto ? `background-image:url(${esc(p.foto)})` : ''}">${p.foto ? '' : 'Sin foto'}</div>
-          <input type="file" accept="image/*" id="archivoFoto"></div>
+        <div class="campo"><label>Fotos (planas sobre la cama o el piso, con luz pareja)</label>
+          <div class="dos fotos-dos">
+            <div><div class="foto-previa" id="prev" style="${p.foto ? `background-image:url(${esc(p.foto)})` : ''}">${p.foto ? '' : 'Sin foto'}</div>
+              <span class="rot-foto">Frente</span><input type="file" accept="image/*" id="archivoFoto"></div>
+            <div><div class="foto-previa" id="prev2" style="${p.foto2 ? `background-image:url(${esc(p.foto2)})` : ''}">${p.foto2 ? '' : 'Sin foto'}</div>
+              <span class="rot-foto">Dorso (opcional)</span><input type="file" accept="image/*" id="archivoFoto2">
+              ${p.foto2 ? '<button type="button" class="btn sec chico" id="quitarFoto2">Quitar dorso</button>' : ''}</div>
+          </div></div>
         ${conColor(p.tipo) ? `<div class="dos">
           <div class="campo"><label>Color principal</label><input type="color" name="color" value="${esc(p.color || '#444444')}"></div>
           ${p.tipo === 'zapatilla' ? `<div class="campo"><label>Color de la suela</label><input type="color" name="color2" value="${esc(p.color2 || '#eeeeee')}"></div>` : '<div class="campo"><label>&nbsp;</label><button type="button" class="btn sec chico" id="detectar">Tomar color de la foto</button></div>'}
@@ -346,6 +354,12 @@ function abrirEditor(id) {
       if (!f) return;
       try { p = leer(); p.foto = await reducirFoto(f); pintar(); avisar('Foto cargada. Podés tomar el color desde ella.'); } catch (err) { avisar(err.message); }
     });
+    $('#archivoFoto2').addEventListener('change', async e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try { p = leer(); p.foto2 = await reducirFoto(f); pintar(); avisar('Foto del dorso cargada.'); } catch (err) { avisar(err.message); }
+    });
+    $('#quitarFoto2')?.addEventListener('click', () => { p = leer(); p.foto2 = null; pintar(); });
     $('#detectar')?.addEventListener('click', async () => {
       if (!p.foto) { avisar('Primero cargá una foto.'); return; }
       p = leer(); p.color = await colorPromedio(p.foto); pintar();
@@ -541,6 +555,7 @@ document.addEventListener('click', e => {
     const a = d.accion;
     if (a === 'nueva-prenda') abrirEditor(null);
     if (a === 'guardar-outfit') guardarOutfitActual();
+    if (a === 'dorso') { verDorso = !verDorso; pintarHoy(); }
     if (a === 'sacar-todo') { look = LOOK_VACIO(); pintarHoy(); }
     if (a === 'exportar') descargar(`armario-respaldo-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(store.exportar(), null, 1));
     if (a === 'salir') store.salir();

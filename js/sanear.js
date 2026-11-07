@@ -33,7 +33,7 @@ export function sanearPrenda(p) {
     nombre: texto(p.nombre, 120), nota: texto(p.nota, 500),
     tengo: p.tengo !== false, estimado: !!p.estimado,
     color: colorSeguro(p.color), lavado: numero(p.lavado, 0, 0, 1),
-    foto: fotoSegura(p.foto), categorias: categorias(p.categorias),
+    foto: fotoSegura(p.foto), foto2: fotoSegura(p.foto2), categorias: categorias(p.categorias),
   };
   if (p.color2 !== undefined) s.color2 = colorSeguro(p.color2, '#eeeeee');
   if (p.denim !== undefined) s.denim = !!p.denim;

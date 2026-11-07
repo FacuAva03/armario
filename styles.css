@@ -179,6 +179,7 @@ a { color: var(--laton-oscuro); }
 .campo input[type="file"] { max-width: 100%; }
 .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .check { display: flex; align-items: center; gap: 8px; }
+.fotos-dos { align-items: start; } .fotos-dos > div { display: grid; gap: 6px; min-width: 0; } .fotos-dos input[type=file] { width: 100%; min-width: 0; font-size: 12px; } .rot-foto { font-size: 12px; font-weight: 700; color: var(--suave); }
 .foto-previa { height: 130px; border-radius: 10px; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: var(--lino); display: grid; place-items: center; color: var(--suave); }
 .aviso { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tab) + 18px + env(safe-area-inset-bottom)); z-index: 40; background: var(--nogal-0); color: var(--crema);
   padding: 10px 16px; border-radius: 999px; font-size: 13.5px; box-shadow: var(--sombra); max-width: 92vw; border: 1px solid var(--laton); }

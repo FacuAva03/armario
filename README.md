@@ -8,6 +8,7 @@ ordenadas como en un armario, y las combinaciones para cada ocasión, armadas co
   remera a medias adentro, vueltas de ruedo) y un *chequeo de calce* en dedos.
 - **Armario:** por secciones, como un armario de verdad: riel con perchas, estantes, zapatero y cajón de
   accesorios. Las prendas que faltan comprar van en una lista aparte.
+- **Foto de frente y de dorso:** cada prenda admite dos fotos; en *Hoy* el botón *Ver de espaldas* da vuelta las prendas que tengan dorso.
 - **Categorías:** cada prenda puede tener varias (Gym, Diario, Salir, Trabajo, Verano, Invierno, Casa o las que crees).
   Se usan para filtrar el armario y el selector de *Hoy*; los looks se filtran por ocasión.
 - **Looks:** combinaciones guardadas y sugeridas, con una miniatura ordenada de cada una y si se pueden armar hoy.
