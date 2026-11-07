@@ -1,6 +1,6 @@
 // Service worker: deja abrir la app sin conexión. Los archivos propios van "red primero"
 // (así cada publicación llega al toque) y las librerías de Firebase, "caché primero".
-const CACHE = 'armario-v5';
+const CACHE = 'armario-v6';
 const ARCHIVOS = [
   './', './index.html', './styles.css', './config.js', './manifest.webmanifest',
   './js/app.js', './js/store.js', './js/datos.js', './js/calce.js', './js/silueta.js', './js/sanear.js', './js/guia.js',
