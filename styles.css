@@ -207,3 +207,23 @@ a { color: var(--laton-oscuro); }
 .cats-editor { display: flex; gap: 6px; flex-wrap: wrap; }
 .agregar-cat { display: flex; gap: 8px; margin-top: 6px; }
 .agregar-cat input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--linea); background: #fffdf7; }
+
+/* Guía para medir las prendas */
+.guia-tarjeta { margin-top: 12px; }
+.guia { border-top: 1px dashed var(--linea); padding: 2px 0; }
+.guia:first-of-type { border-top: 0; }
+.guia summary { cursor: pointer; padding: 10px 2px; font-weight: 700; font-family: var(--serif); list-style: none; display: flex; align-items: center; justify-content: space-between; }
+.guia summary::-webkit-details-marker { display: none; }
+.guia summary::after { content: "+"; font-size: 20px; color: var(--laton-oscuro); line-height: 1; }
+.guia[open] > summary::after { content: "−"; }
+.guia-cuerpo { padding: 0 2px 12px; display: grid; gap: 10px; }
+.guia-mini { background: var(--lino); border-radius: 10px; border-top: 0; padding: 0 10px; }
+.guia-svg { width: 100%; max-width: 300px; margin: 0 auto; display: block; }
+.guia-svg .gl { font: 700 13px system-ui, sans-serif; fill: #2a1c12; }
+.tabla-guia { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.tabla-guia td, .tabla-guia th { padding: 7px 6px; vertical-align: top; text-align: left; border-top: 1px solid var(--linea); font-weight: 400; }
+.tabla-guia th { font-weight: 700; white-space: nowrap; }
+.tabla-guia td:first-child { width: 34px; padding-right: 0; }
+.letra { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--laton-claro); border: 1px solid var(--laton-oscuro); font-weight: 800; font-size: 12px; color: #2a1c12; }
+.lista-guia { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13.5px; }
+@media (max-width: 520px) { .tabla-guia th { white-space: normal; } }

@@ -11,7 +11,8 @@ ordenadas como en un armario, y las combinaciones para cada ocasión, armadas co
 - **Categorías:** cada prenda puede tener varias (Gym, Diario, Salir, Trabajo, Verano, Invierno, Casa o las que crees).
   Se usan para filtrar el armario y el selector de *Hoy*; los looks se filtran por ocasión.
 - **Looks:** combinaciones guardadas y sugeridas, con una miniatura ordenada de cada una y si se pueden armar hoy.
-- **Medidas:** las del cuerpo (para el chequeo de calce), exportar e importar respaldo.
+- **Medidas:** las del cuerpo (para el chequeo de calce), una guía con dibujos de cómo medir cada prenda (también
+  dentro del editor de cada prenda, en *¿Cómo se mide?*), exportar e importar respaldo.
 
 Stack: HTML + CSS + JavaScript sin build, sin librerías. Firebase Spark (login con email y Firestore) para
 sincronizar la compu y el celu, y GitHub Pages. Costo: $0.
@@ -70,6 +71,7 @@ El workflow de `.github/workflows/publicar.yml` revisa la sintaxis y publica en 
 | `js/silueta.js` | Siluetas dibujadas para las prendas sin foto, y la percha. |
 | `js/calce.js` | Reglas de calce en dedos (largo del short, manga, ruedo…). |
 | `js/datos.js` | Tipos de prenda, categorías, medidas que se piden y datos de ejemplo. |
+| `js/guia.js` | La guía de cómo medir las prendas (dibujos y tablas). |
 | `js/sanear.js` | Valida todo dato que entra (colores, fotos, textos, categorías) antes de mostrarlo. |
 | `js/store.js` | Datos: Firebase si hay configuración, `localStorage` si no. |
 

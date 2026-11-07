@@ -3,6 +3,7 @@ import * as store from './store.js';
 import { SLOTS, TIPOS, CAMPOS, CATEGORIAS_BASE } from './datos.js';
 import { silueta, PERCHA } from './silueta.js';
 import { infoPrendas, chequear } from './calce.js';
+import { guiaCompleta, guiaMedir } from './guia.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const vista = $('#vista');
@@ -273,6 +274,7 @@ function abrirEditor(id) {
           ${p.tipo === 'zapatilla' ? `<div class="campo"><label>Color de la suela</label><input type="color" name="color2" value="${esc(p.color2 || '#eeeeee')}"></div>` : '<div class="campo"><label>&nbsp;</label><button type="button" class="btn sec chico" id="detectar">Tomar color de la foto</button></div>'}
         </div>` : ''}
         ${camposHTML(p.tipo, p)}
+        ${guiaMedir(p.tipo) ? `<details class="guia guia-mini"><summary>¿Cómo se mide?</summary>${guiaMedir(p.tipo)}</details>` : ''}
         <div class="campo"><label>Categorías (para qué la usás)</label>
           <div class="cats-editor">${todasCats().map(c => `<button type="button" class="chip${cats.includes(c) ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
           <div class="agregar-cat"><input type="text" id="nuevaCat" maxlength="24" placeholder="Otra categoría (ej: Running)"><button type="button" class="btn sec chico" id="addCat">Agregar</button></div></div>
@@ -298,13 +300,20 @@ function abrirEditor(id) {
       if (form.elements.color) nuevo.color = fd.get('color');
       if (form.elements.color2) nuevo.color2 = fd.get('color2');
       for (const c of CAMPOS[nuevo.tipo] || []) {
+        // Al cambiar de tipo, los campos del tipo nuevo todavía no están en el formulario: se usa lo que había o el valor por defecto.
+        if (!form.elements[c.k]) { nuevo[c.k] = p[c.k] ?? c.def; continue; }
         if (c.tipo === 'opcion') nuevo[c.k] = fd.get(c.k);
         else if (c.tipo === 'casilla') nuevo[c.k] = form.elements[c.k].checked;
         else { const n = Number(fd.get(c.k)); nuevo[c.k] = Number.isFinite(n) ? n : c.def; }
       }
       return nuevo;
     };
-    form.elements.tipo.addEventListener('change', () => { p = leer(); pintar(); });
+    form.elements.tipo.addEventListener('change', () => {
+      p = leer();
+      // Cada tipo tiene sus propias medidas: al cambiar, se parte de los valores típicos del tipo nuevo.
+      for (const c of CAMPOS[p.tipo] || []) p[c.k] = c.def;
+      pintar();
+    });
     form.querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => {
       const c = b.dataset.cat;
       cats = cats.includes(c) ? cats.filter(x => x !== c) : [...cats, c].slice(0, 8);
@@ -410,11 +419,12 @@ function renderYo() {
   const p = datos.perfil;
   const u = datos.usuario;
   vista.innerHTML = `
-    <header class="cab"><div><h1>Mis medidas</h1><p>Sirven para el chequeo de calce. Todo en centímetros.</p></div></header>
+    <header class="cab"><div><h1>Mis medidas</h1><p>Las de tu cuerpo y cómo medir tus prendas. Todo en centímetros.</p></div></header>
     <form id="formPerfil" class="tarjeta" style="display:grid;gap:12px">
       <div class="dos">${MEDIDAS.map(([k, n]) => `<div class="campo"><label>${n}</label><input type="number" inputmode="decimal" step="0.5" name="${k}" value="${p[k] ?? ''}"></div>`).join('')}</div>
       <button class="btn" type="submit">Guardar medidas</button>
     </form>
+    ${guiaCompleta()}
     <div class="tarjeta" style="margin-top:12px;display:grid;gap:10px">
       <h3>Datos y sincronización</h3>
       <p class="nota">${store.modoNube ? `Sincronizado en la nube${u?.email ? ` como ${esc(u.email)}` : ''}. Los mismos datos en la compu y el celu, solo con tu cuenta.` : store.modoDemo ? 'Modo demostración: datos de ejemplo guardados solo en este navegador.' : 'Modo local: los datos están solo en este dispositivo. Para usarlos en la compu y el celu hay que activar la nube (ver README).'}</p>
