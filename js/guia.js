@@ -71,7 +71,7 @@ const TABLA_MANGA_LARGA = `<table class="tabla-guia"><tbody>
 <ul class="lista-guia">
   <li><b>Camisa:</b> abrochala antes de medir, y no cuentes el cuello.</li>
   <li><b>Campera:</b> cerrala con el cierre antes de medir.</li>
-  <li><b>Capucha:</b> no se mide, solo tildá la casilla <i>Tiene capucha</i>.</li>
+  <li><b>Capucha:</b> no se mide, solo tildá la casilla <i>Tiene capucha</i>. Para la foto, dejala <b>hacia abajo</b>, apoyada plana sobre la espalda: en la foto de frente casi no se ve, y en la del dorso se ve entera. Con la capucha puesta la prenda se deforma y el largo cambia.</li>
   <li><b>Check rápido:</b> con un largo de brazo de 56 cm, una manga de unos 60 cm (con la caída incluida) te llega a la muñeca; más de 64 cm te tapa la mano.</li>
 </ul>`;
 
