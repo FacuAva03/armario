@@ -1,7 +1,7 @@
 // Validación de los datos que entran a la app (respaldos importados, base de datos, almacenamiento local).
 // Todo lo que se imprime en pantalla pasa por acá: solo se aceptan colores hexadecimales, fotos en formato
 // data:image y textos acotados. Cualquier otra cosa se descarta o se reemplaza por un valor seguro.
-import { TIPOS, CAMPOS, PERFIL_BASE } from './datos.js';
+import { TIPOS, CAMPOS, PERFIL_BASE, slotsDe } from './datos.js';
 
 const HEX = /^#[0-9a-f]{6}$/i;
 const FOTO = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
@@ -29,7 +29,7 @@ export function sanearPrenda(p) {
   const tipo = TIPOS[p.tipo] ? p.tipo : null;
   if (!id || !tipo) return null;
   const s = {
-    id, tipo, slot: TIPOS[tipo].slot,
+    id, tipo, slot: slotsDe(tipo).includes(p.slot) ? p.slot : TIPOS[tipo].slot,
     nombre: texto(p.nombre, 120), nota: texto(p.nota, 500),
     tengo: p.tengo !== false, estimado: !!p.estimado,
     color: colorSeguro(p.color), lavado: numero(p.lavado, 0, 0, 1),
@@ -53,7 +53,7 @@ export function sanearOutfit(o) {
   const op = o.opts && typeof o.opts === 'object' ? o.opts : {};
   return {
     id, nombre: texto(o.nombre, 120), ocasion: texto(o.ocasion, 60), nota: texto(o.nota, 500), sugerido: !!o.sugerido,
-    top: idSeguro(o.top), bottom: idSeguro(o.bottom), shoes: idSeguro(o.shoes),
+    top: idSeguro(o.top), capa: idSeguro(o.capa), bottom: idSeguro(o.bottom), medias: idSeguro(o.medias), shoes: idSeguro(o.shoes),
     acc: Array.isArray(o.acc) ? o.acc.map(idSeguro).filter(Boolean).slice(0, 6) : [],
     opts: {
       mangaDoblada: !!op.mangaDoblada,

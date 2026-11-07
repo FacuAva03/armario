@@ -63,14 +63,30 @@ const BASICOS = `<ul class="lista-guia">
   <li><b>Si no estás seguro</b> de una medida, tildá <i>Las medidas son estimadas</i>: el chequeo de calce avisa que es aproximado y después la corregís.</li>
 </ul>`;
 
+const TXT_MANGA_LARGA = `<p class="nota">En <b>buzos, camperas y camisas</b> el largo de manga se mide hasta el puño (o hasta el borde de la manga), y la boca de manga es el ancho del puño relajado, sin estirarlo. En el buzo, el borde de abajo suele ser más angosto que el pecho (el elástico): medilo igual, de costado a costado, sin estirarlo.</p>`;
+
+const TXT_MEDIAS = `<ul class="lista-guia">
+  <li><b>Tobillera:</b> no pasa el hueso del tobillo; con zapatillas bajas casi no se ve.</li>
+  <li><b>Media caña:</b> llega justo sobre el tobillo, a unos 2 o 3 dedos.</li>
+  <li><b>Larga:</b> sube hasta la pantorrilla; es la típica de gym o de fútbol.</li>
+  <li>Las medias no llevan más medidas: contá el color y el largo.</li>
+</ul>`;
+
+const TXT_CINTURON = `<ul class="lista-guia"><li><b>Largo total:</b> estiralo sobre una mesa y medí desde el extremo de la hebilla hasta el último agujero. Un cinturón se compra para que el agujero que más usás quede al medio.</li></ul>`;
+
+const TXT_SIN_MEDIDAS = `<ul class="lista-guia"><li><b>Gorras, lentes, pulseras y mochilas</b> no piden medidas: alcanza con la foto, el color y las categorías.</li></ul>`;
+
 export const esRemera = t => t === 'remera' || t === 'musculosa';
 export const esJean = t => t === 'pantalon' || t === 'short';
 
 // Guía corta, para mostrar dentro del editor de una prenda.
 export function guiaMedir(tipo) {
   if (esRemera(tipo)) return `<div class="guia-cuerpo">${SVG_REMERA}${TABLA_REMERA}</div>`;
+  if (['camisa', 'buzo', 'campera'].includes(tipo)) return `<div class="guia-cuerpo">${SVG_REMERA}${TABLA_REMERA}${TXT_MANGA_LARGA}</div>`;
+  if (tipo === 'medias') return `<div class="guia-cuerpo">${TXT_MEDIAS}</div>`;
+  if (tipo === 'cinturon') return `<div class="guia-cuerpo">${TXT_CINTURON}</div>`;
   if (esJean(tipo)) return `<div class="guia-cuerpo">${SVG_JEAN}${TABLA_JEAN}</div>`;
-  if (tipo === 'zapatilla') return `<div class="guia-cuerpo">${TXT_ZAPA}</div>`;
+  if (tipo === 'zapatilla' || tipo === 'zapato') return `<div class="guia-cuerpo">${TXT_ZAPA}</div>`;
   if (tipo === 'cadena') return `<div class="guia-cuerpo">${TXT_CADENA}</div>`;
   return '';
 }
@@ -83,8 +99,12 @@ export function guiaCompleta() {
     <p class="nota">Se miden con la prenda apoyada plana. Tocá cada sección para ver el dibujo y dónde va la cinta.</p>
     ${sec('Antes de empezar', BASICOS, true)}
     ${sec('Remera o musculosa', SVG_REMERA + TABLA_REMERA)}
+    ${sec('Camisa, buzo o campera', SVG_REMERA + TABLA_REMERA + TXT_MANGA_LARGA)}
     ${sec('Jean, pantalón o short', SVG_JEAN + TABLA_JEAN)}
-    ${sec('Zapatillas', TXT_ZAPA)}
+    ${sec('Medias', TXT_MEDIAS)}
+    ${sec('Zapatillas y zapatos', TXT_ZAPA)}
     ${sec('Cadena', TXT_CADENA)}
+    ${sec('Cinturón', TXT_CINTURON)}
+    ${sec('Gorras, lentes y otros', TXT_SIN_MEDIDAS)}
   </div>`;
 }

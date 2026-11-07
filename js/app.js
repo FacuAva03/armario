@@ -1,6 +1,6 @@
 // Armario: la combinación del día con las fotos ordenadas, el armario por secciones, los looks y las medidas.
 import * as store from './store.js';
-import { SLOTS, TIPOS, CAMPOS, CATEGORIAS_BASE } from './datos.js';
+import { SLOTS, TIPOS, CAMPOS, CATEGORIAS_BASE, slotsDe } from './datos.js';
 import { silueta, PERCHA } from './silueta.js';
 import { infoPrendas, chequear } from './calce.js';
 import { guiaCompleta, guiaMedir } from './guia.js';
@@ -18,7 +18,8 @@ let soloTengo = false;
 let catHoy = null;          // categoría activa en el selector de "Hoy"
 let filtroCat = null;       // categoría activa en el Armario
 let ocasionActiva = null;   // ocasión activa en los Looks
-let look = { top: null, bottom: null, shoes: null, acc: [] };
+const LOOK_VACIO = () => ({ top: null, capa: null, bottom: null, medias: null, shoes: null, acc: [] });
+let look = LOOK_VACIO();
 let opts = { mangaDoblada: false, metida: 'no', vueltas: null };
 
 // ---------- Utilidades ----------
@@ -98,11 +99,14 @@ function tablero(lk, mp, mini = false) {
       ? `<div class="pieza ${clase}${p ? '' : ' vacia'}">${cuerpo}</div>`
       : `<button class="pieza ${clase}${p ? '' : ' vacia'}" data-pick="${slot}" aria-label="${vacio}">${cuerpo}</button>`;
   };
+  // Los extras van en una columna a la derecha: los que hay y, si faltan, dos lugares vacíos para sumar.
+  const columna = mini ? extras : [...extras, ...Array(Math.max(0, 2 - extras.length)).fill(null)];
   return `<div class="tablero${mini ? ' mini' : ''}">
-    ${pieza('p-e1', extras[0], 'acc', 'Extra')}
+    ${pieza('p-capa', it(lk.capa), 'capa', 'Encima')}
     ${pieza('p-top', it(lk.top), 'top', 'Arriba')}
-    ${pieza('p-e2', extras[1], 'acc', 'Extra')}
+    <div class="ext">${columna.map(p => pieza('p-e', p, 'acc', 'Extra')).join('')}</div>
     ${pieza('p-bottom', it(lk.bottom), 'bottom', 'Abajo')}
+    ${pieza('p-medias', it(lk.medias), 'medias', 'Medias')}
     ${pieza('p-shoes', it(lk.shoes), 'shoes', 'Calzado')}
   </div>`;
 }
@@ -111,7 +115,8 @@ function notasDeUso(lk, op, mp) {
   const top = lk.top ? mp.get(lk.top) : null;
   const bajo = lk.bottom ? mp.get(lk.bottom) : null;
   const n = [];
-  if (op.mangaDoblada && top?.tipo === 'remera') n.push('Manga doblada');
+  const conManga = x => x && (x.tipo === 'remera' || x.tipo === 'camisa');
+  if (op.mangaDoblada && (conManga(top) || conManga(lk.capa ? mp.get(lk.capa) : null))) n.push('Manga doblada');
   if (op.metida === 'media' && top && bajo) n.push('Remera a medias adentro');
   const v = op.vueltas ?? bajo?.vueltas ?? 0;
   if (v > 0 && bajo?.tipo === 'pantalon') n.push(`${v} ${v === 1 ? 'vuelta' : 'vueltas'} de ruedo`);
@@ -141,7 +146,7 @@ function pintarHoy() {
   const avisos = chequear(info, opts);
   const sel = slotActivo === 'acc' ? look.acc : [look[slotActivo]];
   const notas = notasDeUso(look, opts, mp);
-  const faltan = [look.top, look.bottom, look.shoes, ...look.acc].filter(Boolean).map(id => mp.get(id)).filter(p => p && !p.tengo);
+  const faltan = [look.top, look.capa, look.bottom, look.medias, look.shoes, ...look.acc].filter(Boolean).map(id => mp.get(id)).filter(p => p && !p.tengo);
 
   $('#mesa').innerHTML = `${tablero(look, mp)}
     ${notas.length ? `<div class="notas-uso">${notas.map(n => `<span>${esc(n)}</span>`).join('')}</div>` : ''}
@@ -190,7 +195,7 @@ function renderHoy() {
 }
 
 function aplicarLook(o) {
-  look = { top: o.top || null, bottom: o.bottom || null, shoes: o.shoes || null, acc: [...(o.acc || [])] };
+  look = { top: o.top || null, capa: o.capa || null, bottom: o.bottom || null, medias: o.medias || null, shoes: o.shoes || null, acc: [...(o.acc || [])] };
   opts = { mangaDoblada: !!o.opts?.mangaDoblada, metida: o.opts?.metida || 'no', vueltas: o.opts?.vueltas ?? null };
 }
 
@@ -223,25 +228,31 @@ function renderArmario() {
   const cats = categoriasUsadas();
   const de = (...tipos) => tengo.filter(p => tipos.includes(p.tipo));
   const seccion = (titulo, cuerpo, vacio) => (!cuerpo && filtroCat ? '' : `<section class="seccion"><h2 class="rotulo">${titulo}</h2>${cuerpo || `<p class="nota vacio-s">${vacio}</p>`}</section>`);
-  const colgado = de('remera', 'musculosa');
+  const colgado = de('remera', 'musculosa', 'camisa');
+  const abrigos = de('buzo', 'campera');
   const abajo = de('pantalon', 'short');
-  const zapas = de('zapatilla');
-  const extras = de('cadena', 'reloj');
+  const zapas = de('zapatilla', 'zapato');
+  const medias = de('medias');
+  const extras = de('cadena', 'reloj', 'pulsera', 'gorra', 'lentes', 'cinturon', 'mochila');
   vista.innerHTML = `<header class="cab"><div><h1>Mi armario</h1><p>${tengo.length} prendas guardadas${filtroCat ? ` en “${esc(filtroCat)}”` : ''}${comprar.length ? ` · ${comprar.length} en la lista de compras` : ''}</p></div>
       <button class="btn" data-accion="nueva-prenda">+ Prenda</button></header>
     ${cats.length ? `<div class="pestanas filtros"><button class="chip${!filtroCat ? ' on' : ''}" data-filtrocat="">Todas</button>
       ${cats.map(c => `<button class="chip${filtroCat === c ? ' on' : ''}" data-filtrocat="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
     <div class="armario">
-      ${seccion('Colgado', colgado.length ? `<div class="riel">${colgado.map(p => tarjetaArmario(p, true)).join('')}</div>` : '', 'Todavía no hay remeras ni musculosas.')}
+      ${seccion('Colgado', colgado.length ? `<div class="riel">${colgado.map(p => tarjetaArmario(p, true)).join('')}</div>` : '', 'Todavía no hay remeras, musculosas ni camisas.')}
+      ${seccion('Abrigos', abrigos.length ? `<div class="riel">${abrigos.map(p => tarjetaArmario(p, true)).join('')}</div>` : '', 'Buzos y camperas.')}
       ${seccion('Pantalones y shorts', abajo.length ? `<div class="estante">${abajo.map(p => tarjetaArmario(p)).join('')}</div>` : '', 'Todavía no hay pantalones.')}
       ${seccion('Zapatero', zapas.length ? `<div class="estante zapatero">${zapas.map(p => tarjetaArmario(p)).join('')}</div>` : '', 'Todavía no hay calzado.')}
-      ${seccion('Cajón de accesorios', extras.length ? `<div class="cajon">${extras.map(p => tarjetaArmario(p)).join('')}</div>` : '', 'Cadenas, relojes y demás.')}
+      ${seccion('Cajón de medias', medias.length ? `<div class="cajon">${medias.map(p => tarjetaArmario(p)).join('')}</div>` : '', 'Todavía no hay medias.')}
+      ${seccion('Cajón de accesorios', extras.length ? `<div class="cajon">${extras.map(p => tarjetaArmario(p)).join('')}</div>` : '', 'Cadenas, relojes, gorras, cinturones y demás.')}
     </div>
     ${comprar.length ? `<section class="compras"><h2>Lista de compras</h2><p class="nota">Lo que te falta para armar los looks sugeridos.</p>
       <div class="notas-compra">${comprar.map(p => `<button class="papelito" data-editar="${esc(p.id)}">${imagen(p)}<b>${esc(p.nombre)}</b></button>`).join('')}</div></section>` : ''}`;
 }
 
 // ---------- Editor de prenda ----------
+const USO_SLOT = { top: 'Como prenda de arriba (sola)', capa: 'Encima de otra prenda (abrigo)' };
+
 function camposHTML(tipo, p) {
   return (CAMPOS[tipo] || []).map(c => {
     const v = p[c.k] ?? c.def;
@@ -266,6 +277,7 @@ function abrirEditor(id) {
           <button type="button" class="cerrar-x" id="cerrarX" aria-label="Cerrar">✕</button></div>
         <div class="campo"><label>Nombre</label><input type="text" name="nombre" value="${esc(p.nombre)}" placeholder="Ej: Remera azul lavada" required></div>
         <div class="campo"><label>Tipo</label><select name="tipo">${Object.entries(TIPOS).map(([k, v]) => `<option value="${k}"${p.tipo === k ? ' selected' : ''}>${v.nombre}</option>`).join('')}</select></div>
+        ${slotsDe(p.tipo).length > 1 ? `<div class="campo"><label>¿Cómo la usás?</label><select name="slot">${slotsDe(p.tipo).map(sl => `<option value="${sl}"${(p.slot || TIPOS[p.tipo].slot) === sl ? ' selected' : ''}>${USO_SLOT[sl]}</option>`).join('')}</select></div>` : ''}
         <div class="campo"><label>Foto (de frente, plana sobre la cama o el piso, con luz pareja)</label>
           <div class="foto-previa" id="prev" style="${p.foto ? `background-image:url(${esc(p.foto)})` : ''}">${p.foto ? '' : 'Sin foto'}</div>
           <input type="file" accept="image/*" id="archivoFoto"></div>
@@ -292,7 +304,8 @@ function abrirEditor(id) {
     const leer = () => {
       const fd = new FormData(form);
       const nuevo = { ...p, nombre: fd.get('nombre') || '', tipo: fd.get('tipo') };
-      nuevo.slot = TIPOS[nuevo.tipo].slot;
+      const pedido = form.elements.slot?.value;
+      nuevo.slot = slotsDe(nuevo.tipo).includes(pedido) ? pedido : TIPOS[nuevo.tipo].slot;
       nuevo.tengo = form.elements.tengo.checked;
       nuevo.estimado = form.elements.estimado.checked;
       nuevo.nota = fd.get('nota') || '';
@@ -310,6 +323,7 @@ function abrirEditor(id) {
     };
     form.elements.tipo.addEventListener('change', () => {
       p = leer();
+      p.slot = TIPOS[p.tipo].slot;
       // Cada tipo tiene sus propias medidas: al cambiar, se parte de los valores típicos del tipo nuevo.
       for (const c of CAMPOS[p.tipo] || []) p[c.k] = c.def;
       pintar();
@@ -347,7 +361,7 @@ function abrirEditor(id) {
     $('#borrar')?.addEventListener('click', () => {
       if (!confirm(`¿Borrar “${p.nombre}” del armario?`)) return;
       store.borrarPrenda(p.id);
-      for (const k of ['top', 'bottom', 'shoes']) if (look[k] === p.id) look[k] = null;
+      for (const k of ['top', 'capa', 'bottom', 'medias', 'shoes']) if (look[k] === p.id) look[k] = null;
       look.acc = look.acc.filter(x => x !== p.id);
       hoja.close();
     });
@@ -377,7 +391,7 @@ function renderLooks() {
     ${ocasiones.length > 1 ? `<div class="pestanas filtros"><button class="chip${!ocasionActiva ? ' on' : ''}" data-ocasion="">Todos</button>
       ${ocasiones.map(c => `<button class="chip${ocasionActiva === c ? ' on' : ''}" data-ocasion="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
     <div class="looks">${ordenados.map(o => {
-      const ids = [o.top, o.bottom, o.shoes, ...(o.acc || [])].filter(Boolean);
+      const ids = [o.top, o.capa, o.bottom, o.medias, o.shoes, ...(o.acc || [])].filter(Boolean);
       const faltan = ids.filter(id => mp.get(id) && !mp.get(id).tengo).length;
       const notas = notasDeUso(o, o.opts || {}, mp);
       return `<article class="look">
@@ -527,7 +541,7 @@ document.addEventListener('click', e => {
     const a = d.accion;
     if (a === 'nueva-prenda') abrirEditor(null);
     if (a === 'guardar-outfit') guardarOutfitActual();
-    if (a === 'sacar-todo') { look = { top: null, bottom: null, shoes: null, acc: [] }; pintarHoy(); }
+    if (a === 'sacar-todo') { look = LOOK_VACIO(); pintarHoy(); }
     if (a === 'exportar') descargar(`armario-respaldo-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(store.exportar(), null, 1));
     if (a === 'salir') store.salir();
     if (a === 'reiniciar' && confirm('Se borran los cambios locales y vuelven los datos iniciales. ¿Seguro?')) store.reiniciarLocal();
